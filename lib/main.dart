@@ -3,8 +3,11 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(
-      new MaterialApp(debugShowCheckedModeBanner: false, home: Mycalculator()));
+  runApp(new MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Mycalculator(),
+      theme:
+          ThemeData(brightness: Brightness.dark, primaryColor: Colors.indigo)));
 }
 
 class Mycalculator extends StatefulWidget {
@@ -17,7 +20,20 @@ class Mycalculator extends StatefulWidget {
 class SIFormState extends State<Mycalculator> {
   final minimupadding = 5.0;
   var currency = ['Rupees', 'Dollar', 'Pound'];
-  var currencyvalue = 'Rupees';
+
+  // var currencyvalue = 'Rupees';
+  var currencyvalue = '';
+  @override
+  void initState() {
+    super.initState();
+    currencyvalue = currency[0];
+  }
+
+  var displayresult = '';
+  TextEditingController interestcont = TextEditingController();
+  TextEditingController roicont = TextEditingController();
+  TextEditingController termcont = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +51,7 @@ class SIFormState extends State<Mycalculator> {
                 padding:
                     EdgeInsets.only(top: minimupadding, bottom: minimupadding),
                 child: TextField(
+                  controller: interestcont,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                       labelText: 'Principal',
@@ -46,6 +63,7 @@ class SIFormState extends State<Mycalculator> {
                 padding:
                     EdgeInsets.only(top: minimupadding, bottom: minimupadding),
                 child: TextField(
+                  controller: roicont,
                   // keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                       labelText: 'Interest',
@@ -60,10 +78,11 @@ class SIFormState extends State<Mycalculator> {
                 children: <Widget>[
                   Expanded(
                       child: TextField(
+                    controller: termcont,
                     // keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                        labelText: 'Interest',
-                        hintText: 'Enter Interest',
+                        labelText: 'Terms',
+                        hintText: 'Terms in year',
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5.0))),
                   )),
@@ -93,14 +112,36 @@ class SIFormState extends State<Mycalculator> {
                 children: <Widget>[
                   Expanded(
                       child: RaisedButton(
-                    child: Text('Calculate'),
-                    onPressed: () {},
+                    child: Text(
+                      'Calculate',
+                      textScaleFactor: 1.5,
+                    ),
+                    color: Theme.of(context).accentColor,
+                    textColor: Theme.of(context).primaryColorDark,
+                    onPressed: () {
+                      setState(() {
+                        this.displayresult = calculatereturn();
+                      });
+                    },
                   )),
                   Container(width: minimupadding * 5),
                   Expanded(
                       child: RaisedButton(
-                    child: Text('Reset'),
-                    onPressed: () {},
+                    color: Theme.of(context).primaryColorDark,
+                    textColor: Theme.of(context).primaryColorLight,
+                    child: Text(
+                      'Reset',
+                      textScaleFactor: 1.5,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        interestcont.text = '';
+                        roicont.text = '';
+                        termcont.text = '';
+                        currencyvalue = currency[0];
+                        displayresult = '';
+                      });
+                    },
                   ))
                 ],
               ),
@@ -108,7 +149,7 @@ class SIFormState extends State<Mycalculator> {
             Padding(
               padding:
                   EdgeInsets.only(top: minimupadding, bottom: minimupadding),
-              child: Text('Hello Text'),
+              child: Text(this.displayresult),
             )
           ],
         ),
@@ -124,5 +165,16 @@ class SIFormState extends State<Mycalculator> {
       child: image,
       margin: EdgeInsets.all(minimupadding * 10),
     );
+  }
+
+  String calculatereturn() {
+    double princial = double.parse(interestcont.text);
+    double roi = double.parse(roicont.text);
+    double temr = double.parse(termcont.text);
+
+    double totalamount = princial + (princial * roi * temr) / 100;
+    String valustring =
+        'After $temr year, interest is $totalamount $currencyvalue';
+    return valustring;
   }
 }
